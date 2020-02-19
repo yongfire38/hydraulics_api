@@ -270,7 +270,7 @@ public class GetArea {
 			in = new FileInputStream(f);
 
 			// channelSftp.cd("/data1/if_data/WEI"); //as-is, 연계서버에 떨어지는 위치
-			channelSftp.cd("/data1/test"); // test
+			channelSftp.cd("/data1/test/TEST"); // test
 
 			String fileName = f.getName();
 			channelSftp.put(in, fileName);
