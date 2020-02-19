@@ -295,7 +295,7 @@ public class GetRiver {
 				e.printStackTrace();
 			}
 		}
-
+		
 		logger.info("sftp transfer complete!");
 	}
 

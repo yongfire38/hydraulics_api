@@ -296,7 +296,7 @@ public class GetArea {
 				e.printStackTrace();
 			}
 		}
-
+	 
 		logger.info("sftp transfer complete!");
 
 	}
