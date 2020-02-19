@@ -26,13 +26,13 @@ import common.DBConnection;
 import common.JsonParser;
 
 public class GetArea {
-	
+
 	final static Logger logger = Logger.getLogger(GetArea.class);
-	
+
 	// 수리수문정보 서비스 - 면적사업 속성 조회
 	@SuppressWarnings("unchecked")
 	public static void getArea() throws Exception {
-		
+
 		logger.info("firstLine start..");
 		String mgtNo = "";
 
@@ -48,7 +48,7 @@ public class GetArea {
 		Date thisDate = new Date();
 		String strDate = format.format(thisDate);
 
-		File file = new File("HydraulicsService_getArea_" + strDate + ".dat");
+		File file = new File("/home/chkusr/TEST_DATA/HydraulicsService_getArea_" + strDate + ".dat");
 
 		try {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
@@ -234,7 +234,7 @@ public class GetArea {
 			Thread.sleep(1000);
 
 		}
-		
+
 		logger.info("parsing complete!");
 
 		// step 5. 대상 서버에 sftp로 보냄
@@ -242,10 +242,13 @@ public class GetArea {
 		Session session = null;
 		Channel channel = null;
 		ChannelSftp channelSftp = null;
+		File f = new File("/home/chkusr/TEST_DATA/HydraulicsService_getArea_" + strDate + ".dat");
+		FileInputStream in = null;
 
-		logger.debug("preparing the host information for sftp.");
+		System.out.println("preparing the host information for sftp.");
 
 		try {
+
 			JSch jsch = new JSch();
 			session = jsch.getSession("agntuser", "172.29.129.11", 28);
 			session.setPassword("Dpdlwjsxm1@");
@@ -263,28 +266,39 @@ public class GetArea {
 			// 파일 업로드 처리
 			channelSftp = (ChannelSftp) channel;
 
+			System.out.println("=> Connected to host");
+			in = new FileInputStream(f);
+
 			// channelSftp.cd("/data1/if_data/WEI"); //as-is, 연계서버에 떨어지는 위치
 			channelSftp.cd("/data1/test"); // test
-			File f = new File("HydraulicsService_getArea_" + strDate + ".dat");
+
 			String fileName = f.getName();
-			channelSftp.put(new FileInputStream(f), fileName);
+			channelSftp.put(in, fileName);
+
+			System.out.println("=> Uploaded : " + f.getPath());
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			// sftp 채널을 닫음
-			channelSftp.exit();
+			try {
 
-			// 채널 연결 해제
-			channel.disconnect();
+				in.close();
 
-			// 호스트 세션 종료
-			session.disconnect();
+				// sftp 채널을 닫음
+				channelSftp.exit();
 
+				// 채널 연결 해제
+				channel.disconnect();
+
+				// 호스트 세션 종료
+				session.disconnect();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		logger.info("sftp transfer complete!");
-		
+
 	}
-	
+
 }
